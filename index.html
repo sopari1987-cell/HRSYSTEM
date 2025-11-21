@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HSSI HR Portal</title>
+    <title>HSSI HR Portal - Xero Style</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,39 +12,62 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     
-    <!-- Babel untuk memproses JSX di browser -->
+    <!-- Babel untuk memproses JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Lucide Icons (via script untuk akses global jika diperlukan, tapi kita pakai SVG langsung biar aman) -->
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        /* Animasi loading */
-        .spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid white; width: 20px; height: 20px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        /* Custom Scrollbar untuk Sidebar */
+        .sidebar-scroll::-webkit-scrollbar { width: 5px; }
+        .sidebar-scroll::-webkit-scrollbar-track { background: #1f2937; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 2px; }
+        
+        /* Animasi */
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .slide-down { animation: slideDown 0.3s ease-out forwards; transform-origin: top; }
+        @keyframes slideDown { from { transform: scaleY(0); max-height: 0; } to { transform: scaleY(1); max-height: 500px; } }
+
+        /* Warna Custom sesuai gambar */
+        .bg-header { background-color: #9E4B4B; /* Merah Marun pudar */ }
+        .bg-sidebar { background-color: #2C3136; /* Hitam keabu-abuan */ }
+        .bg-sidebar-dark { background-color: #22262A; }
+        .text-sidebar-active { color: #4ADE80; /* Hijau terang */ }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-100 text-gray-800 overflow-hidden">
 
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // --- ICONS COMPONENTS (Manual SVG agar tidak perlu dependency external) ---
-        const IconUser = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
-        const IconLock = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
-        const IconEye = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>;
-        const IconEyeOff = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>;
-        const IconMapPin = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>;
-        const IconHome = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
-        const IconUserCircle = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg>;
-        const IconBell = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>;
-        const IconLogOut = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>;
+        // --- ICON COMPONENTS (Manual SVG) ---
+        const Icons = {
+            User: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+            Lock: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
+            Eye: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>,
+            EyeOff: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>,
+            Dashboard: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>,
+            Settings: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
+            Pin: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" x2="12" y1="17" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>,
+            Briefcase: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>,
+            FileText: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>,
+            CheckSquare: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>,
+            ChevronRight: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>,
+            ChevronDown: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m6 9 6 6 6-6"/></svg>,
+            Menu: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>,
+            Bell: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>,
+            Search: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+            Home: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+            Plus: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        };
 
-        // KONFIGURASI API (Gunakan URL Script Google Sheet Anda)
         const API_URL = "https://script.google.com/macros/s/AKfycbxU-fhKgDANAjgwLZtiez2VN2PQtTNv6dEQ6FGN8RtGFA6CEBEXdHMJv9tFIoI1aNvf2Q/exec";
 
-        // --- COMPONENT: LOGIN PAGE ---
+        // --- LOGIN PAGE (Sama seperti sebelumnya) ---
         const LoginPage = ({ onLogin, loading, error }) => {
             const [username, setUsername] = useState('');
             const [password, setPassword] = useState('');
@@ -57,15 +80,10 @@
 
             return (
                 <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-gray-900">
-                    {/* Background Gradient Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-500 to-orange-500 z-0 opacity-90"></div>
-                    
-                    {/* Pattern Overlay */}
                     <div className="absolute inset-0 z-0 opacity-10" style={{backgroundImage: "url('https://www.transparenttextures.com/patterns/cubes.png')"}}></div>
 
                     <div className="container mx-auto px-4 z-10 flex flex-col md:flex-row items-center justify-between h-full max-w-6xl">
-                        
-                        {/* LEFT SIDE: Branding */}
                         <div className="hidden md:block w-1/2 text-white p-8 space-y-6">
                             <div className="flex items-center gap-2 mb-8">
                                 <span className="text-2xl font-bold italic flex items-center gap-1">
@@ -76,8 +94,6 @@
                                 Bring management of human resources in your company to the next level
                             </h1>
                         </div>
-
-                        {/* RIGHT SIDE: Form */}
                         <div className="w-full md:w-1/3 p-6">
                             <div className="text-center mb-8">
                                 <h2 className="text-white font-bold text-lg uppercase tracking-wide leading-relaxed">
@@ -86,67 +102,26 @@
                                 <div className="h-1 w-24 bg-gray-300/30 mx-auto my-4 rounded-full"></div>
                                 <p className="text-white/90 text-sm">Sign in to your account</p>
                             </div>
-
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div className="relative group">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none border-r border-gray-200 pr-2 my-2">
-                                        <IconUser className="h-5 w-5 text-gray-500" />
+                                        <Icons.User className="h-5 w-5 text-gray-500" />
                                     </div>
-                                    <input
-                                        type="text"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        className="block w-full pl-14 pr-3 py-3 bg-blue-50/90 border-0 rounded-md text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all outline-none"
-                                        placeholder="Username (e.g., HSSI_293)"
-                                        required
-                                    />
+                                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="block w-full pl-14 pr-3 py-3 bg-blue-50/90 border-0 rounded-md text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all outline-none" placeholder="Username" required />
                                 </div>
-
                                 <div className="relative group">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none border-r border-gray-200 pr-2 my-2">
-                                        <IconLock className="h-5 w-5 text-gray-500" />
+                                        <Icons.Lock className="h-5 w-5 text-gray-500" />
                                     </div>
-                                    <input
-                                        type={showPassword ? "text" : "password"}
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        className="block w-full pl-14 pr-10 py-3 bg-blue-50/90 border-0 rounded-md text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all outline-none"
-                                        placeholder="Password"
-                                        required
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
-                                    >
-                                        {showPassword ? <IconEyeOff className="h-5 w-5" /> : <IconEye className="h-5 w-5" />}
+                                    <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} className="block w-full pl-14 pr-10 py-3 bg-blue-50/90 border-0 rounded-md text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all outline-none" placeholder="Password" required />
+                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700">
+                                        {showPassword ? <Icons.EyeOff className="h-5 w-5" /> : <Icons.Eye className="h-5 w-5" />}
                                     </button>
                                 </div>
-
-                                <div className="text-white/80 text-xs text-left">
-                                    Username and Password are case sensitive
-                                </div>
-
-                                {error && (
-                                    <div className="bg-red-500/80 text-white text-sm p-3 rounded text-center backdrop-blur-sm border border-red-400">
-                                        {error}
-                                    </div>
-                                )}
-
+                                {error && <div className="bg-red-500/80 text-white text-sm p-3 rounded text-center backdrop-blur-sm border border-red-400">{error}</div>}
                                 <div className="space-y-3 pt-2">
-                                    <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className="w-full flex justify-center py-3 px-4 border border-transparent rounded shadow-sm text-sm font-bold text-white bg-green-500 hover:bg-green-600 focus:outline-none uppercase tracking-wide transition-colors disabled:opacity-50 items-center gap-2"
-                                    >
+                                    <button type="submit" disabled={loading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded shadow-sm text-sm font-bold text-white bg-green-500 hover:bg-green-600 focus:outline-none uppercase tracking-wide transition-colors disabled:opacity-50 items-center gap-2">
                                         {loading ? <div className="spinner"></div> : 'SIGN IN'}
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        className="w-full flex justify-center py-3 px-4 border border-transparent rounded shadow-sm text-sm font-bold text-white bg-orange-400 hover:bg-orange-500 focus:outline-none uppercase tracking-wide transition-colors"
-                                    >
-                                        FORGOT PASSWORD
                                     </button>
                                 </div>
                             </form>
@@ -156,121 +131,263 @@
             );
         };
 
-        // --- COMPONENT: DASHBOARD ---
+        // --- COMPONENTS BARU UNTUK SIDEBAR LAYOUT ---
+
+        // 1. Sidebar Menu Item
+        const SidebarItem = ({ label, icon: Icon, active, hasSub, expanded, onClick, subItems, onSubItemClick }) => {
+            return (
+                <div>
+                    <div 
+                        onClick={onClick} 
+                        className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-colors hover:bg-gray-800 border-l-4 ${active ? 'border-green-500 bg-gray-800' : 'border-transparent text-gray-400 hover:text-white'}`}
+                    >
+                        <div className="flex items-center gap-3">
+                            {Icon && <Icon className="w-4 h-4" />}
+                            <span className="text-sm font-medium">{label}</span>
+                        </div>
+                        {hasSub && (
+                            expanded ? <Icons.ChevronDown className="w-3 h-3" /> : <Icons.ChevronRight className="w-3 h-3" />
+                        )}
+                    </div>
+                    
+                    {/* Sub Menu Area */}
+                    {hasSub && expanded && (
+                        <div className="bg-sidebar-dark py-1 slide-down">
+                            {subItems.map((sub, idx) => (
+                                <div 
+                                    key={idx}
+                                    onClick={() => onSubItemClick(sub)}
+                                    className="pl-12 pr-4 py-2 text-xs text-gray-400 hover:text-white cursor-pointer flex items-center gap-2 hover:bg-gray-700 transition-colors"
+                                >
+                                    {sub.icon && <sub.icon className="w-3 h-3" />}
+                                    {sub.label}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // 2. Main Dashboard Layout
         const Dashboard = ({ user, onLogout }) => {
-            const [activeTab, setActiveTab] = useState('home');
             const [currentTime, setCurrentTime] = useState(new Date());
             const [isClockedIn, setIsClockedIn] = useState(false);
+            const [sidebarExpandedMenu, setSidebarExpandedMenu] = useState('Employee Self Service'); // Default open
+            const [activePage, setActivePage] = useState('Dashboard');
 
             useEffect(() => {
                 const timer = setInterval(() => setCurrentTime(new Date()), 1000);
                 return () => clearInterval(timer);
             }, []);
 
-            const handleAttendance = () => {
-                if (!isClockedIn) {
-                    setIsClockedIn(true);
-                    alert(`Halo ${user.username}, Berhasil Check-In!`);
+            const handleMenuClick = (menuName) => {
+                if (sidebarExpandedMenu === menuName) {
+                    setSidebarExpandedMenu(null); // Collapse if same
                 } else {
-                    setIsClockedIn(false);
-                    alert(`Sampai jumpa ${user.username}, Berhasil Check-Out!`);
+                    setSidebarExpandedMenu(menuName);
+                    setActivePage(menuName); // Set active page logic
                 }
             };
 
-            const renderContent = () => {
-                if (activeTab === 'profile') {
-                    return (
-                        <div className="space-y-4 pb-20 animate-fade-in">
-                            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                                <div className="bg-blue-900 h-24 relative">
-                                    <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
-                                        <div className="w-20 h-20 bg-gray-200 rounded-full border-4 border-white flex items-center justify-center text-2xl font-bold text-gray-500">
-                                            {user.username.charAt(0)}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="pt-12 pb-6 px-4 text-center">
-                                    <h2 className="text-xl font-bold text-gray-800">{user.username}</h2>
-                                    <p className="text-gray-500 text-sm">Role: {user.role}</p>
-                                </div>
-                            </div>
-                            <button onClick={onLogout} className="w-full mt-4 flex items-center justify-center gap-2 text-red-600 border border-red-200 p-3 rounded-lg hover:bg-red-50 transition">
-                                <IconLogOut className="w-4 h-4" /> Logout
-                            </button>
+            // --- STRUKTUR MENU SIDEBAR ---
+            const menuStructure = [
+                { name: 'Dashboard', icon: Icons.Dashboard },
+                { name: 'Administrator', icon: Icons.Settings, hasSub: true, subs: [{label: 'Users'}, {label: 'Settings'}] },
+                { name: 'My Menu', icon: Icons.Pin, hasSub: true, subs: [{label: 'Favorites'}] },
+                { 
+                    name: 'Employee Self Service', 
+                    icon: Icons.User, 
+                    hasSub: true, 
+                    subs: [
+                        { label: 'My Attendance', icon: Icons.Clock },
+                        { label: 'Request progress', icon: Icons.CheckSquare },
+                        { label: 'Leave Request', icon: Icons.FileText },
+                        { label: 'Overtime Request', icon: Icons.Clock },
+                        { label: 'Permit Request', icon: Icons.FileText },
+                        { label: 'Payslip history', icon: Icons.FileText },
+                    ]
+                },
+                { name: 'Validation', icon: Icons.CheckSquare, hasSub: true, subs: [{label: 'Approval'}] },
+                { name: 'Report', icon: Icons.FileText, hasSub: true, subs: [{label: 'Monthly Report'}] },
+                { name: 'My Company', icon: Icons.Briefcase, hasSub: true, subs: [{label: 'Organization'}] },
+            ];
+
+            return (
+                <div className="flex h-screen w-full bg-gray-100 font-sans">
+                    
+                    {/* --- SIDEBAR --- */}
+                    <div className="w-64 bg-sidebar flex flex-col flex-shrink-0 text-gray-300 transition-all duration-300 shadow-xl z-20">
+                        {/* Sidebar Header / Logo Area */}
+                        <div className="h-14 flex items-center px-4 bg-sidebar-dark border-b border-gray-700">
+                             <span className="text-xl font-bold italic text-white flex items-center gap-1">
+                                <span className="text-blue-400">X</span>ero
+                            </span>
                         </div>
-                    )
-                }
-                // HOME TAB
-                return (
-                    <div className="space-y-5 pb-20 animate-fade-in">
-                        <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
-                            <div className="bg-gradient-to-r from-blue-800 to-blue-600 p-4 text-white flex justify-between items-center">
-                                <div>
-                                    <h3 className="font-semibold">Absensi Hari Ini</h3>
-                                    <p className="text-xs text-blue-100">{new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'})}</p>
-                                </div>
-                                <div className="text-right">
-                                    <div className="text-2xl font-mono font-bold leading-none">
-                                        {currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
-                                    </div>
-                                </div>
+
+                        {/* User Profile Widget */}
+                        <div className="p-6 flex items-center gap-4 border-b border-gray-700 bg-sidebar">
+                            <div className="w-12 h-12 rounded-full bg-red-500 border-2 border-white overflow-hidden">
+                                {/* Placeholder Image */}
+                                <img src={`https://ui-avatars.com/api/?name=${user.username}&background=ef4444&color=fff`} alt="User" className="w-full h-full object-cover" />
                             </div>
-                            <div className="p-6 flex flex-col items-center">
-                                <div className={`w-32 h-32 rounded-full flex items-center justify-center border-4 shadow-inner transition-all duration-300 cursor-pointer ${isClockedIn ? 'bg-red-50 border-red-100' : 'bg-blue-50 border-blue-100'}`}
-                                    onClick={handleAttendance}>
-                                    <div className={`w-24 h-24 rounded-full flex flex-col items-center justify-center shadow-lg transform transition-transform active:scale-95 ${isClockedIn ? 'bg-red-500' : 'bg-blue-600'}`}>
-                                        <IconMapPin className="text-white w-8 h-8 mb-1" />
-                                        <span className="text-white font-bold text-sm">{isClockedIn ? 'CHECK OUT' : 'CHECK IN'}</span>
-                                    </div>
+                            <div>
+                                <div className="text-white font-bold text-sm uppercase tracking-wider">{user.username}</div>
+                                <div className="flex items-center gap-1 text-xs text-green-400 mt-1">
+                                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                                    Online
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                            <div className="flex">
-                                <div className="ml-3">
-                                    <p className="text-sm text-yellow-700">
-                                        Anda login sebagai <span className="font-bold">{user.role}</span>.
-                                    </p>
-                                </div>
+
+                        {/* Navigation Header */}
+                        <div className="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-widest">
+                            Navigation
+                        </div>
+
+                        {/* Scrollable Menu */}
+                        <div className="flex-1 overflow-y-auto sidebar-scroll">
+                            {menuStructure.map((item, index) => (
+                                <SidebarItem 
+                                    key={index}
+                                    label={item.name}
+                                    icon={item.icon}
+                                    active={activePage === item.name || (item.hasSub && sidebarExpandedMenu === item.name)}
+                                    hasSub={item.hasSub}
+                                    expanded={sidebarExpandedMenu === item.name}
+                                    subItems={item.subs}
+                                    onClick={() => handleMenuClick(item.name)}
+                                    onSubItemClick={(sub) => alert(`Membuka menu: ${sub.label}`)}
+                                />
+                            ))}
+                            
+                            <div className="mt-8 px-4 mb-4">
+                                <button onClick={onLogout} className="w-full py-2 border border-red-500 text-red-500 text-xs rounded hover:bg-red-500 hover:text-white transition text-center">
+                                    LOGOUT
+                                </button>
                             </div>
                         </div>
                     </div>
-                );
-            };
 
-            return (
-                <div className="min-h-screen bg-gray-50 max-w-md mx-auto relative shadow-2xl flex flex-col">
-                    <header className="bg-white px-5 py-4 flex justify-between items-center sticky top-0 z-10 border-b border-gray-100">
-                        <div>
-                            <p className="text-xs text-gray-400">Selamat Datang,</p>
-                            <h1 className="font-bold text-gray-800 text-lg leading-tight">{user.username}</h1>
+                    {/* --- MAIN CONTENT WRAPPER --- */}
+                    <div className="flex-1 flex flex-col min-w-0 bg-gray-200">
+                        
+                        {/* --- TOP HEADER BAR --- */}
+                        <header className="h-14 bg-header flex items-center justify-between px-4 shadow-md z-10">
+                            <div className="flex items-center gap-4">
+                                <button className="text-white/80 hover:text-white">
+                                    <Icons.Menu className="w-6 h-6" />
+                                </button>
+                            </div>
+                            
+                            <div className="flex items-center gap-4 text-white">
+                                <div className="relative cursor-pointer">
+                                    <Icons.Bell className="w-5 h-5" />
+                                    <span className="absolute -top-1 -right-1 bg-blue-500 text-[8px] px-1 rounded-sm">381</span>
+                                </div>
+                                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center cursor-pointer">
+                                    <Icons.User className="w-4 h-4" />
+                                </div>
+                                <Icons.Search className="w-5 h-5 cursor-pointer" />
+                            </div>
+                        </header>
+
+                        {/* --- SUB HEADER (BREADCRUMB & WIDGET SELECTOR) --- */}
+                        <div className="bg-white border-b border-gray-300 h-12 flex items-center justify-between px-4 shadow-sm">
+                            <div className="text-gray-500 cursor-pointer hover:text-gray-700">
+                                <Icons.Home className="w-4 h-4" />
+                            </div>
+                            
+                            <div className="flex items-center gap-1">
+                                <select className="border border-gray-300 text-xs py-1 px-2 rounded text-gray-600 outline-none">
+                                    <option>-- Select Widget --</option>
+                                </select>
+                                <button className="p-1 border border-gray-300 rounded hover:bg-gray-50">
+                                    <Icons.Plus className="w-4 h-4 text-gray-600" />
+                                </button>
+                            </div>
                         </div>
-                        <IconBell className="w-5 h-5 text-gray-600" />
-                    </header>
 
-                    <main className="p-5 flex-1 overflow-y-auto">
-                        {renderContent()}
-                    </main>
+                        {/* --- WIDGET CONTENT GRID --- */}
+                        <div className="flex-1 overflow-y-auto p-4">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
+                                
+                                {/* WIDGET 1: ATTENDANCE CHECK IN */}
+                                <div className="bg-white shadow-sm border-t-4 border-gray-300 lg:col-span-2">
+                                    <div className="bg-gray-200 px-4 py-2 font-bold text-gray-700 text-sm border-b border-gray-300">
+                                        Attendance Check In
+                                    </div>
+                                    <div className="p-8 flex flex-col items-center justify-center min-h-[200px] text-center">
+                                        <h2 className="text-xl text-gray-600 mb-2">
+                                            Welcome to HRMS Zero, <span className="font-bold uppercase">{user.username}</span>.
+                                        </h2>
+                                        <p className="text-xs text-gray-500 mb-6">
+                                            Server Time : {currentTime.toLocaleString('en-GB')}
+                                        </p>
+                                        
+                                        <div className="mb-4">
+                                            {isClockedIn ? (
+                                                 <span className="text-green-600 font-bold text-sm">
+                                                    Checked In at : {new Date().toLocaleDateString()} {currentTime.toLocaleTimeString()}
+                                                 </span>
+                                            ) : (
+                                                <span className="text-orange-500 font-bold text-sm">
+                                                    Not Checked In Yet
+                                                </span>
+                                            )}
+                                        </div>
 
-                    <nav className="bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-20 pb-6 sticky bottom-0">
-                        <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 ${activeTab === 'home' ? 'text-blue-600' : 'text-gray-400'}`}>
-                            <IconHome className="w-6 h-6" /><span className="text-[10px]">Beranda</span>
-                        </button>
-                        <button onClick={() => setActiveTab('profile')} className={`flex flex-col items-center gap-1 ${activeTab === 'profile' ? 'text-blue-600' : 'text-gray-400'}`}>
-                            <IconUserCircle className="w-6 h-6" /><span className="text-[10px]">Akun</span>
-                        </button>
-                    </nav>
+                                        <button 
+                                            onClick={() => setIsClockedIn(!isClockedIn)}
+                                            className={`px-6 py-2 rounded text-white text-sm font-bold transition ${isClockedIn ? 'bg-red-500 hover:bg-red-600' : 'bg-green-600 hover:bg-green-700'}`}
+                                        >
+                                            {isClockedIn ? 'Check Out' : 'Check In Now'}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* WIDGET 2: LEAVE BALANCE */}
+                                <div className="bg-white shadow-sm border-t-4 border-gray-300">
+                                    <div className="bg-gray-200 px-4 py-2 font-bold text-gray-700 text-sm border-b border-gray-300">
+                                        My Leave Balance
+                                    </div>
+                                    <div className="p-4">
+                                        <select className="w-full border border-gray-300 rounded p-1 text-sm mb-4">
+                                            <option>-- Select --</option>
+                                            <option>Cuti Tahunan</option>
+                                        </select>
+                                        <div className="text-right text-xs font-bold text-gray-500">
+                                            0 / 0
+                                        </div>
+                                        <div className="mt-2 h-1 bg-gray-100 w-full"></div>
+                                    </div>
+                                </div>
+
+                                 {/* WIDGET 3: MY TEAM (Bottom) */}
+                                 <div className="bg-white shadow-sm border-t-4 border-gray-300 lg:col-span-3">
+                                    <div className="bg-gray-200 px-4 py-2 font-bold text-gray-700 text-sm border-b border-gray-300 flex justify-between">
+                                        <span>My Team</span>
+                                        <span className="text-gray-400 cursor-pointer">x</span>
+                                    </div>
+                                    <div className="p-4 min-h-[100px]">
+                                        {/* Content Team */}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             );
         };
 
-        // --- APP ROOT ---
+        // --- ROOT APP (Sama seperti sebelumnya) ---
         const App = () => {
             const [user, setUser] = useState(null);
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState('');
 
-            // Check session saat load
             useEffect(() => {
                 const savedUser = localStorage.getItem('hssi_user_real');
                 if (savedUser) {
@@ -281,14 +398,11 @@
             const handleLogin = async (username, password) => {
                 setLoading(true);
                 setError('');
-
                 try {
                     const url = `${API_URL}?action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
                     const response = await fetch(url);
-                    
                     if (!response.ok) throw new Error('Gagal menghubungi server.');
                     const data = await response.json();
-
                     if (data.status === 'success') {
                         const userData = { username: data.data.username, role: data.data.role };
                         setUser(userData);
@@ -298,7 +412,7 @@
                     }
                 } catch (err) {
                     console.error(err);
-                    setError('Terjadi kesalahan jaringan atau server. Pastikan Internet aktif.');
+                    setError('Terjadi kesalahan. Coba lagi.');
                 } finally {
                     setLoading(false);
                 }
@@ -313,7 +427,6 @@
             return <Dashboard user={user} onLogout={handleLogout} />;
         };
 
-        // Render ke DOM
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
