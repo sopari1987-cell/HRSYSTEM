@@ -1,597 +1,520 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HSSI HR Portal - Xero Style</title>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- React & ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    
-    <!-- Babel untuk memproses JSX -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        
-        /* Scrollbar Custom */
-        .sidebar-scroll::-webkit-scrollbar { width: 5px; }
-        .sidebar-scroll::-webkit-scrollbar-track { background: #1f2937; }
-        .sidebar-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 2px; }
-        
-        /* Animations */
-        .fade-in { animation: fadeIn 0.3s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .slide-down { animation: slideDown 0.3s ease-out forwards; transform-origin: top; }
-        @keyframes slideDown { from { transform: scaleY(0); max-height: 0; } to { transform: scaleY(1); max-height: 500px; } }
+      /* --- XERO STYLE THEME --- */
+      body {
+        font-family: 'Source Sans Pro', sans-serif;
+        background-color: #ecf0f5;
+        font-size: 14px;
+        overflow-x: hidden;
+      }
 
-        /* Warna Custom Xero Style */
-        .bg-header { background-color: #C0504D; /* Merah Bata/Marun sesuai gambar */ }
-        .bg-sidebar { background-color: #2C3136; }
-        .bg-sidebar-dark { background-color: #22262A; }
-        
-        /* Table Styling Custom */
-        .table-bordered th, .table-bordered td {
-            border: 1px solid #cbd5e1;
-        }
-        .holiday-row {
-            background-color: #C0504D;
-            color: white;
-        }
-        .holiday-row td {
-            border-color: #dca5a5; /* Border lebih terang di background merah */
-        }
+      /* LOGIN PAGE */
+      #login-page {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(135deg, #5d69bc 0%, #a1887f 50%, #c62828 100%);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .login-box {
+        width: 360px;
+        background: rgba(255,255,255,0.15);
+        padding: 30px;
+        border-radius: 5px;
+        color: #fff;
+        text-align: left;
+      }
+      .login-header h2 { font-weight: 300; margin-bottom: 10px; }
+      .login-header h4 { font-weight: 700; margin-bottom: 30px; }
+      .login-input {
+        background: #fff;
+        border: none;
+        height: 45px;
+        margin-bottom: 15px;
+        padding-left: 15px;
+        width: 100%;
+        border-radius: 3px;
+      }
+      .btn-login {
+        width: 100%;
+        background-color: #5cb85c;
+        border: none;
+        color: white;
+        height: 45px;
+        font-weight: bold;
+        border-radius: 3px;
+      }
+      .btn-forgot {
+        width: 100%;
+        background-color: #f0ad4e;
+        border: none;
+        color: white;
+        height: 40px;
+        font-weight: bold;
+        margin-top: 10px;
+        border-radius: 3px;
+      }
+
+      /* MAIN LAYOUT (Hidden by default) */
+      #app-layout { display: none; }
+
+      /* HEADER */
+      .main-header {
+        background: linear-gradient(to right, #5c6bc0, #8d6e63, #c62828);
+        height: 50px;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+        color: white;
+      }
+      .logo-lg { font-weight: bold; font-size: 20px; }
+
+      /* SIDEBAR */
+      .main-sidebar {
+        background-color: #222d32;
+        width: 230px;
+        position: fixed;
+        top: 50px;
+        bottom: 0;
+        left: 0;
+        padding-top: 20px;
+        color: #b8c7ce;
+      }
+      .user-panel {
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #444;
+        margin-bottom: 15px;
+      }
+      .user-panel img {
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        margin-right: 10px;
+      }
+      .sidebar-menu { list-style: none; padding: 0; margin: 0; }
+      .sidebar-menu li { border-bottom: 1px solid #2a373e; }
+      .sidebar-menu li a {
+        display: block;
+        padding: 12px 20px;
+        color: #b8c7ce;
+        text-decoration: none;
+      }
+      .sidebar-menu li a:hover, .sidebar-menu li a.active {
+        background-color: #1e282c;
+        color: #fff;
+        border-left: 3px solid #3c8dbc;
+      }
+      .sidebar-menu .treeview-menu {
+        display: none; /* JS will toggle this */
+        background: #2c3b41;
+        padding-left: 20px;
+      }
+      .sidebar-menu .treeview-menu a { font-size: 13px; }
+
+      /* CONTENT WRAPPER */
+      .content-wrapper {
+        margin-left: 230px;
+        margin-top: 50px;
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      /* CARDS & UTILS */
+      .card-box {
+        background: #fff;
+        border-top: 3px solid #d2d6de;
+        box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        border-radius: 3px;
+      }
+      .card-header {
+        background-color: #f4f4f4;
+        padding: 10px 15px;
+        border-bottom: 1px solid #f4f4f4;
+        font-weight: bold;
+        color: #444;
+      }
+      .card-body { padding: 20px; }
+      .page-title { margin-bottom: 15px; font-size: 24px; color: #444; }
+      
+      /* TABLES (Red header style from screenshot) */
+      .table-xero thead {
+        background-color: #d9534f; /* Reddish brown */
+        color: white;
+        font-size: 12px;
+        text-align: center;
+      }
+      .table-xero th, .table-xero td {
+        vertical-align: middle !important;
+        font-size: 13px;
+        border: 1px solid #ddd;
+      }
+      .weekend-row { background-color: #f9d6d5; } /* Light red for weekends */
+
+      /* HELPERS */
+      .d-none { display: none !important; }
+      .required { color: red; }
     </style>
-</head>
-<body class="bg-gray-100 text-gray-800 overflow-hidden">
+  </head>
+  <body>
 
-    <div id="root"></div>
+    <div id="login-page">
+      <div class="login-box">
+        <div class="login-header">
+          <h2>Xero</h2>
+          <h4>Sign in to your account</h4>
+        </div>
+        <form onsubmit="handleLogin(event)">
+          <input type="text" id="email" class="login-input" placeholder="Username / Email" value="user@test.com">
+          <input type="password" id="password" class="login-input" placeholder="Password" value="password">
+          <button type="submit" class="btn-login">SIGN IN</button>
+          <button type="button" class="btn-forgot">FORGOT PASSWORD</button>
+          <small style="display:block; margin-top:10px; opacity:0.8;">Username & Password are case sensitive</small>
+          <div id="login-error" class="mt-2 text-warning" style="display:none;"></div>
+        </form>
+      </div>
+    </div>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
+    <div id="app-layout">
+      
+      <header class="main-header">
+        <div class="d-flex align-items-center">
+          <i class="fas fa-bars mr-3" style="cursor:pointer;"></i>
+          <span class="logo-lg">Xero HRMS</span>
+        </div>
+        <div class="d-flex align-items-center">
+          <i class="fas fa-bell mr-4"></i>
+          <div class="d-flex align-items-center">
+            <span class="mr-2" id="header-username">User</span>
+            <i class="fas fa-user-circle fa-lg"></i>
+          </div>
+        </div>
+      </header>
 
-        // --- ICONS ---
-        const Icons = {
-            User: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
-            Lock: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
-            Eye: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>,
-            EyeOff: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>,
-            Dashboard: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>,
-            Settings: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
-            Pin: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" x2="12" y1="17" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>,
-            Briefcase: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>,
-            FileText: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>,
-            CheckSquare: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>,
-            ChevronRight: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>,
-            ChevronDown: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m6 9 6 6 6-6"/></svg>,
-            Menu: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>,
-            Bell: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>,
-            Search: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
-            Home: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-            Plus: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="M12 5v14"/></svg>,
-            Clock: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-            MapPin: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>,
-            LogOut: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
-        };
+      <aside class="main-sidebar">
+        <div class="user-panel">
+          <img src="https://via.placeholder.com/45" alt="User Image">
+          <div>
+            <div id="sidebar-name" style="font-weight:600; color:#fff;">Loading...</div>
+            <div style="font-size:11px;"><i class="fa fa-circle text-success"></i> Online</div>
+          </div>
+        </div>
+        <ul class="sidebar-menu">
+          <li class="header" style="padding: 10px 20px; font-size: 12px; background: #1a2226;">NAVIGATION</li>
+          <li><a href="#" onclick="showPage('dashboard')"><i class="fa fa-tachometer-alt mr-2"></i> <span>Dashboard</span></a></li>
+          
+          <li class="active">
+            <a href="#" onclick="toggleMenu('ess-menu')"><i class="fa fa-user mr-2"></i> <span>Employee Self Service</span> <i class="fa fa-angle-left float-right"></i></a>
+            <ul class="treeview-menu" id="ess-menu" style="display:block;">
+              <li><a href="#" onclick="showPage('attendance')"><i class="far fa-circle mr-2"></i> My Attendance</a></li>
+              <li><a href="#" onclick="showPage('request-progress')"><i class="far fa-circle mr-2"></i> Request Progress</a></li>
+              <li><a href="#" onclick="showPage('leave')"><i class="far fa-circle mr-2"></i> Leave Request</a></li>
+              <li><a href="#" onclick="showPage('overtime')"><i class="far fa-circle mr-2"></i> Overtime Request</a></li>
+              <li><a href="#" onclick="showPage('permit')"><i class="far fa-circle mr-2"></i> Permit Request</a></li>
+              <li><a href="#" onclick="showPage('payslip')"><i class="far fa-circle mr-2"></i> Payslip History</a></li>
+            </ul>
+          </li>
+          <li><a href="#" onclick="logout()"><i class="fa fa-sign-out-alt mr-2"></i> <span>Sign Out</span></a></li>
+        </ul>
+      </aside>
 
-        const API_URL = "https://script.google.com/macros/s/AKfycbxU-fhKgDANAjgwLZtiez2VN2PQtTNv6dEQ6FGN8RtGFA6CEBEXdHMJv9tFIoI1aNvf2Q/exec";
-
-        // --- LOGIN PAGE ---
-        const LoginPage = ({ onLogin, loading, error }) => {
-            const [username, setUsername] = useState('');
-            const [password, setPassword] = useState('');
-            const [showPassword, setShowPassword] = useState(false);
-
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                onLogin(username, password);
-            };
-
-            return (
-                <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-gray-900">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-500 to-orange-500 z-0 opacity-90"></div>
-                    <div className="absolute inset-0 z-0 opacity-10" style={{backgroundImage: "url('https://www.transparenttextures.com/patterns/cubes.png')"}}></div>
-
-                    <div className="container mx-auto px-4 z-10 flex flex-col md:flex-row items-center justify-between h-full max-w-6xl">
-                        <div className="hidden md:block w-1/2 text-white p-8 space-y-6">
-                            <div className="flex items-center gap-2 mb-8">
-                                <span className="text-2xl font-bold italic flex items-center gap-1">
-                                    <span className="text-blue-200">X</span>ero
-                                </span>
-                            </div>
-                            <h1 className="text-4xl lg:text-5xl font-light leading-tight">
-                                Bring management of human resources in your company to the next level
-                            </h1>
-                        </div>
-                        <div className="w-full md:w-1/3 p-6">
-                            <div className="text-center mb-8">
-                                <h2 className="text-white font-bold text-lg uppercase tracking-wide leading-relaxed">
-                                    PT HANWA STEEL SERVICE<br/>INDONESIA
-                                </h2>
-                                <div className="h-1 w-24 bg-gray-300/30 mx-auto my-4 rounded-full"></div>
-                                <p className="text-white/90 text-sm">Sign in to your account</p>
-                            </div>
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none border-r border-gray-200 pr-2 my-2">
-                                        <Icons.User className="h-5 w-5 text-gray-500" />
-                                    </div>
-                                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="block w-full pl-14 pr-3 py-3 bg-blue-50/90 border-0 rounded-md text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all outline-none" placeholder="Username" required />
-                                </div>
-                                <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none border-r border-gray-200 pr-2 my-2">
-                                        <Icons.Lock className="h-5 w-5 text-gray-500" />
-                                    </div>
-                                    <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} className="block w-full pl-14 pr-10 py-3 bg-blue-50/90 border-0 rounded-md text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all outline-none" placeholder="Password" required />
-                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700">
-                                        {showPassword ? <Icons.EyeOff className="h-5 w-5" /> : <Icons.Eye className="h-5 w-5" />}
-                                    </button>
-                                </div>
-                                {error && <div className="bg-red-500/80 text-white text-sm p-3 rounded text-center backdrop-blur-sm border border-red-400">{error}</div>}
-                                <div className="space-y-3 pt-2">
-                                    <button type="submit" disabled={loading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded shadow-sm text-sm font-bold text-white bg-green-500 hover:bg-green-600 focus:outline-none uppercase tracking-wide transition-colors disabled:opacity-50 items-center gap-2">
-                                        {loading ? <div className="spinner"></div> : 'SIGN IN'}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+      <div class="content-wrapper">
+        
+        <div id="page-dashboard" class="page-section">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="card-box">
+                <div class="card-header">Attendance Check In</div>
+                <div class="card-body text-center" style="padding: 50px;">
+                  <h4>Welcome to HRMS Zero, <span class="user-display-name"></span>.</h4>
+                  <p class="text-muted">Server Time: <span id="server-time"></span></p>
+                  <div class="alert alert-success d-inline-block">
+                    Check in time: <strong>--:--</strong>
+                  </div>
                 </div>
-            );
-        };
-
-        // --- COMPONENT: MY ATTENDANCE PAGE (New) ---
-        const MyAttendancePage = () => {
-            // Mock Data untuk Tampilan (Nanti bisa diganti fetch dari Google Sheets 'Attendance')
-            const attendanceData = [
-                { date: '01/11/2025', in: '-', out: '-', break: '-', total: '-', status: 'Holiday', ot_start: '-', ot_end: '-', ot_break: '-', ot_total_hrs: '-', ot_vector: '-' },
-                { date: '02/11/2025', in: '-', out: '-', break: '-', total: '-', status: 'Holiday', ot_start: '-', ot_end: '-', ot_break: '-', ot_total_hrs: '-', ot_vector: '-' },
-                { date: '03/11/2025', in: '07:36', out: '20:22', break: '60', total: '11:46', status: 'Present', ot_start: '17:00', ot_end: '20:00', ot_break: '30', ot_total_hrs: '02:30', ot_vector: '4.5' },
-                { date: '04/11/2025', in: '07:27', out: '18:15', break: '60', total: '09:48', status: 'Present', ot_start: '17:00', ot_end: '18:00', ot_break: '0', ot_total_hrs: '01:00', ot_vector: '1.5' },
-                { date: '05/11/2025', in: '07:26', out: '17:12', break: '60', total: '08:46', status: 'Present', ot_start: '-', ot_end: '-', ot_break: '-', ot_total_hrs: '-', ot_vector: '-' },
-                { date: '06/11/2025', in: '07:24', out: '17:09', break: '60', total: '08:45', status: 'Present', ot_start: '-', ot_end: '-', ot_break: '-', ot_total_hrs: '-', ot_vector: '-' },
-                { date: '07/11/2025', in: '07:38', out: '17:22', break: '60', total: '08:44', status: 'Present', ot_start: '-', ot_end: '-', ot_break: '-', ot_total_hrs: '-', ot_vector: '-' },
-            ];
-
-            return (
-                <div className="space-y-4 animate-fade-in pb-20">
-                    {/* Breadcrumb */}
-                    <div className="text-xs text-gray-500 flex items-center gap-2 mb-2">
-                         <Icons.Home className="w-3 h-3" /> &gt; Employee Self Service &gt; <span className="text-gray-700 font-semibold">My Attendance</span>
-                    </div>
-
-                    {/* Search Condition Header */}
-                    <div className="bg-gray-200 border border-gray-300 px-4 py-2 flex justify-between items-center shadow-sm">
-                        <h2 className="font-bold text-gray-700 text-sm">Search condition</h2>
-                        <button className="text-gray-500 hover:text-gray-700"><Icons.Plus className="w-4 h-4 transform rotate-45" /></button>
-                    </div>
-
-                    {/* Attendance For Header */}
-                    <div className="bg-gray-200 border border-gray-300 px-4 py-2 flex justify-between items-center mt-4 shadow-sm">
-                        <h2 className="font-bold text-gray-700 text-sm">Attendance for 11/2025</h2>
-                    </div>
-
-                    {/* Action Button */}
-                    <div className="flex justify-end">
-                         <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-1.5 text-sm rounded shadow-sm font-medium">Download PDF</button>
-                    </div>
-
-                    {/* SUMMARY TABLE */}
-                    <div className="overflow-x-auto bg-white shadow-sm border border-gray-300">
-                        <div className="bg-gray-100 border-b border-gray-300 text-center font-bold text-sm py-2 text-gray-700">
-                            Summary
-                        </div>
-                        <table className="w-full text-xs text-center table-bordered">
-                            <thead>
-                                <tr className="bg-gray-50 text-gray-700 font-semibold">
-                                    <th colSpan="4" className="py-2">Work status</th>
-                                    <th colSpan="2" className="py-2">Overtime</th>
-                                    <th colSpan="3" className="py-2">Leave</th>
-                                </tr>
-                                <tr className="bg-white text-gray-600 font-medium">
-                                    <th className="py-2 w-1/12">Absent</th>
-                                    <th className="py-2 w-1/12">Late</th>
-                                    <th className="py-2 w-1/12">Present</th>
-                                    <th className="py-2 w-1/12">Early In</th>
-                                    <th className="py-2 w-1/12">Hours</th>
-                                    <th className="py-2 w-1/12">Vectors</th>
-                                    <th className="py-2 w-1/12">Used</th>
-                                    <th className="py-2 w-1/12">In Progress</th>
-                                    <th className="py-2 w-1/12">Remaining</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr className="text-gray-800 h-10">
-                                    <td>0</td>
-                                    <td>0</td>
-                                    <td>8</td>
-                                    <td>8</td>
-                                    <td>3.5</td>
-                                    <td>6.0</td>
-                                    <td>7.0</td>
-                                    <td>0.0</td>
-                                    <td>0.0</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* DETAIL ATTENDANCE TABLE */}
-                    <div className="overflow-x-auto bg-white shadow-sm border border-gray-300 mt-6">
-                        <table className="w-full text-xs text-center table-bordered">
-                            <thead>
-                                <tr className="bg-gray-100 text-gray-700 font-bold">
-                                    <th rowSpan="2" className="py-2 w-24">Date</th>
-                                    <th colSpan="4" className="py-2">Work Time</th>
-                                    <th rowSpan="2" className="py-2 w-16">Early In</th>
-                                    <th rowSpan="2" className="py-2 w-16">Early Out</th>
-                                    <th rowSpan="2" className="py-2 w-16">Late In</th>
-                                    <th rowSpan="2" className="py-2 w-16">Late Out</th>
-                                    <th rowSpan="2" className="py-2 w-16">Shift</th>
-                                    <th colSpan="5" className="py-2">Overtime</th>
-                                </tr>
-                                <tr className="bg-gray-50 text-gray-700 font-semibold">
-                                    <th className="py-2 w-16">In</th>
-                                    <th className="py-2 w-16">Out</th>
-                                    <th className="py-2 px-1">Break (min)</th>
-                                    <th className="py-2 w-16">Total</th>
-                                    
-                                    {/* OT SUB HEADERS */}
-                                    <th className="py-2 w-16">Start</th>
-                                    <th className="py-2 w-16">End</th>
-                                    <th className="py-2 px-1">Break (min)</th>
-                                    <th className="py-2 w-16">Total (hrs)</th>
-                                    <th className="py-2 w-16">Total (vec)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {attendanceData.map((row, idx) => (
-                                    <tr key={idx} className={row.status === 'Holiday' ? 'holiday-row font-medium' : 'bg-white hover:bg-gray-50 text-gray-700'}>
-                                        <td className="py-3 border-r">{row.date}</td>
-                                        <td>{row.in}</td>
-                                        <td>{row.out}</td>
-                                        <td>{row.break}</td>
-                                        <td className="border-r">{row.total}</td>
-                                        
-                                        {/* Exception columns (Empty in mock) */}
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td className="border-r">-</td>
-
-                                        {/* OT Columns */}
-                                        <td>{row.ot_start}</td>
-                                        <td>{row.ot_end}</td>
-                                        <td>{row.ot_break}</td>
-                                        <td>{row.ot_total_hrs}</td>
-                                        <td>{row.ot_vector}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div className="text-xs text-gray-400 italic mt-2">
-                        * Data is generated from Google Sheet Simulation.
-                    </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card-box">
+                <div class="card-header">My Leave Balance</div>
+                <div class="card-body">
+                  <select class="form-control mb-3"><option>Annual Leave</option></select>
+                  <div class="d-flex justify-content-between">
+                    <span>Used: 0</span>
+                    <span>Remaining: 12</span>
+                  </div>
+                  <div class="progress mt-2" style="height: 5px;">
+                    <div class="progress-bar bg-success" style="width: 0%"></div>
+                  </div>
                 </div>
-            );
-        };
+              </div>
+            </div>
+          </div>
+        </div>
 
-
-        // --- SIDEBAR MENU ITEM COMPONENT ---
-        const SidebarItem = ({ label, icon: Icon, active, hasSub, expanded, onClick, subItems, onSubItemClick }) => {
-            return (
-                <div>
-                    <div 
-                        onClick={onClick} 
-                        className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-colors hover:bg-gray-800 border-l-4 ${active ? 'border-green-500 bg-gray-800' : 'border-transparent text-gray-400 hover:text-white'}`}
-                    >
-                        <div className="flex items-center gap-3">
-                            {Icon && <Icon className="w-4 h-4" />}
-                            <span className="text-sm font-medium">{label}</span>
-                        </div>
-                        {hasSub && (
-                            expanded ? <Icons.ChevronDown className="w-3 h-3" /> : <Icons.ChevronRight className="w-3 h-3" />
-                        )}
-                    </div>
-                    
-                    {/* Sub Menu Area */}
-                    {hasSub && expanded && (
-                        <div className="bg-sidebar-dark py-1 slide-down">
-                            {subItems.map((sub, idx) => (
-                                <div 
-                                    key={idx}
-                                    onClick={() => onSubItemClick(sub.label)}
-                                    className="pl-12 pr-4 py-2 text-xs text-gray-400 hover:text-white cursor-pointer flex items-center gap-2 hover:bg-gray-700 transition-colors"
-                                >
-                                    {sub.icon && <sub.icon className="w-3 h-3" />}
-                                    {sub.label}
-                                </div>
-                            ))}
-                        </div>
-                    )}
+        <div id="page-attendance" class="page-section d-none">
+          <h3 class="page-title">My Attendance</h3>
+          
+          <div class="card-box">
+            <div class="card-header">Search Condition</div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="col">
+                  <label>From <span class="required">*</span></label>
+                  <input type="date" class="form-control" value="2025-11-01">
                 </div>
-            );
-        };
-
-        // --- DASHBOARD LAYOUT ---
-        const Dashboard = ({ user, onLogout }) => {
-            const [currentTime, setCurrentTime] = useState(new Date());
-            const [isClockedIn, setIsClockedIn] = useState(false);
-            const [sidebarExpandedMenu, setSidebarExpandedMenu] = useState('Employee Self Service');
-            const [activePage, setActivePage] = useState('Dashboard');
-
-            useEffect(() => {
-                const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-                return () => clearInterval(timer);
-            }, []);
-
-            const handleMenuClick = (menuName) => {
-                if (sidebarExpandedMenu === menuName) {
-                    setSidebarExpandedMenu(null);
-                } else {
-                    setSidebarExpandedMenu(menuName);
-                }
-                // Jika menu tidak punya sub, set page. Jika punya sub, jangan ganti page dulu.
-                if (menuName === 'Dashboard') setActivePage('Dashboard');
-            };
-
-            const handleSubMenuClick = (subLabel) => {
-                setActivePage(subLabel);
-            };
-
-            // --- STRUKTUR MENU SIDEBAR ---
-            const menuStructure = [
-                { name: 'Dashboard', icon: Icons.Dashboard },
-                { name: 'Administrator', icon: Icons.Settings, hasSub: true, subs: [{label: 'Users'}, {label: 'Settings'}] },
-                { name: 'My Menu', icon: Icons.Pin, hasSub: true, subs: [{label: 'Favorites'}] },
-                { 
-                    name: 'Employee Self Service', 
-                    icon: Icons.User, 
-                    hasSub: true, 
-                    subs: [
-                        { label: 'My Attendance', icon: Icons.Clock },
-                        { label: 'Request progress', icon: Icons.CheckSquare },
-                        { label: 'Leave Request', icon: Icons.FileText },
-                        { label: 'Overtime Request', icon: Icons.Clock },
-                        { label: 'Permit Request', icon: Icons.FileText },
-                        { label: 'Payslip history', icon: Icons.FileText },
-                    ]
-                },
-                { name: 'Validation', icon: Icons.CheckSquare, hasSub: true, subs: [{label: 'Approval'}] },
-                { name: 'Report', icon: Icons.FileText, hasSub: true, subs: [{label: 'Monthly Report'}] },
-                { name: 'My Company', icon: Icons.Briefcase, hasSub: true, subs: [{label: 'Organization'}] },
-            ];
-
-            // Render Konten Tengah Berdasarkan Menu Aktif
-            const renderContent = () => {
-                if (activePage === 'My Attendance') {
-                    return <MyAttendancePage />;
-                }
-                
-                // DEFAULT DASHBOARD WIDGETS
-                return (
-                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">  
-                        {/* WIDGET 1: ATTENDANCE CHECK IN */}
-                        <div className="bg-white shadow-sm border-t-4 border-gray-300 lg:col-span-2">
-                            <div className="bg-gray-200 px-4 py-2 font-bold text-gray-700 text-sm border-b border-gray-300">
-                                Attendance Check In
-                            </div>
-                            <div className="p-8 flex flex-col items-center justify-center min-h-[200px] text-center">
-                                <h2 className="text-xl text-gray-600 mb-2">
-                                    Welcome to HRMS Zero, <span className="font-bold uppercase">{user.username}</span>.
-                                </h2>
-                                <p className="text-xs text-gray-500 mb-6">
-                                    Server Time : {currentTime.toLocaleString('en-GB')}
-                                </p>
-                                
-                                <div className="mb-4">
-                                    {isClockedIn ? (
-                                            <span className="text-green-600 font-bold text-sm">
-                                            Checked In at : {new Date().toLocaleDateString()} {currentTime.toLocaleTimeString()}
-                                            </span>
-                                    ) : (
-                                        <span className="text-orange-500 font-bold text-sm">
-                                            Not Checked In Yet
-                                        </span>
-                                    )}
-                                </div>
-
-                                <button 
-                                    onClick={() => setIsClockedIn(!isClockedIn)}
-                                    className={`px-6 py-2 rounded text-white text-sm font-bold transition ${isClockedIn ? 'bg-red-500 hover:bg-red-600' : 'bg-green-600 hover:bg-green-700'}`}
-                                >
-                                    {isClockedIn ? 'Check Out' : 'Check In Now'}
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* WIDGET 2: LEAVE BALANCE */}
-                        <div className="bg-white shadow-sm border-t-4 border-gray-300">
-                            <div className="bg-gray-200 px-4 py-2 font-bold text-gray-700 text-sm border-b border-gray-300">
-                                My Leave Balance
-                            </div>
-                            <div className="p-4">
-                                <select className="w-full border border-gray-300 rounded p-1 text-sm mb-4">
-                                    <option>-- Select --</option>
-                                    <option>Cuti Tahunan</option>
-                                </select>
-                                <div className="text-right text-xs font-bold text-gray-500">
-                                    0 / 0
-                                </div>
-                                <div className="mt-2 h-1 bg-gray-100 w-full"></div>
-                            </div>
-                        </div>
-
-                            {/* WIDGET 3: MY TEAM (Bottom) */}
-                            <div className="bg-white shadow-sm border-t-4 border-gray-300 lg:col-span-3">
-                            <div className="bg-gray-200 px-4 py-2 font-bold text-gray-700 text-sm border-b border-gray-300 flex justify-between">
-                                <span>My Team</span>
-                                <span className="text-gray-400 cursor-pointer">x</span>
-                            </div>
-                            <div className="p-4 min-h-[100px]">
-                                {/* Content Team */}
-                            </div>
-                        </div>
-                    </div>
-                );
-            };
-
-            return (
-                <div className="flex h-screen w-full bg-gray-100 font-sans">
-                    
-                    {/* --- SIDEBAR --- */}
-                    <div className="w-64 bg-sidebar flex flex-col flex-shrink-0 text-gray-300 transition-all duration-300 shadow-xl z-20">
-                        {/* Logo */}
-                        <div className="h-14 flex items-center px-4 bg-sidebar-dark border-b border-gray-700">
-                             <span className="text-xl font-bold italic text-white flex items-center gap-1">
-                                <span className="text-blue-400">X</span>ero
-                            </span>
-                        </div>
-
-                        {/* Profile */}
-                        <div className="p-6 flex items-center gap-4 border-b border-gray-700 bg-sidebar">
-                            <div className="w-12 h-12 rounded-full bg-red-500 border-2 border-white overflow-hidden">
-                                <img src={`https://ui-avatars.com/api/?name=${user.username}&background=ef4444&color=fff`} alt="User" className="w-full h-full object-cover" />
-                            </div>
-                            <div>
-                                <div className="text-white font-bold text-sm uppercase tracking-wider">{user.username}</div>
-                                <div className="flex items-center gap-1 text-xs text-green-400 mt-1">
-                                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                                    Online
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-widest">
-                            Navigation
-                        </div>
-
-                        {/* Menu List */}
-                        <div className="flex-1 overflow-y-auto sidebar-scroll">
-                            {menuStructure.map((item, index) => (
-                                <SidebarItem 
-                                    key={index}
-                                    label={item.name}
-                                    icon={item.icon}
-                                    active={activePage === item.name || (item.hasSub && sidebarExpandedMenu === item.name)}
-                                    hasSub={item.hasSub}
-                                    expanded={sidebarExpandedMenu === item.name}
-                                    subItems={item.subs}
-                                    onClick={() => handleMenuClick(item.name)}
-                                    onSubItemClick={handleSubMenuClick}
-                                />
-                            ))}
-                            
-                            <div className="mt-8 px-4 mb-4">
-                                <button onClick={onLogout} className="w-full py-2 border border-red-500 text-red-500 text-xs rounded hover:bg-red-500 hover:text-white transition text-center">
-                                    LOGOUT
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* --- MAIN CONTENT --- */}
-                    <div className="flex-1 flex flex-col min-w-0 bg-gray-200">
-                        
-                        <header className="h-14 bg-header flex items-center justify-between px-4 shadow-md z-10">
-                            <div className="flex items-center gap-4">
-                                <button className="text-white/80 hover:text-white">
-                                    <Icons.Menu className="w-6 h-6" />
-                                </button>
-                            </div>
-                            <div className="flex items-center gap-4 text-white">
-                                <div className="relative cursor-pointer">
-                                    <Icons.Bell className="w-5 h-5" />
-                                    <span className="absolute -top-1 -right-1 bg-blue-500 text-[8px] px-1 rounded-sm">381</span>
-                                </div>
-                                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center cursor-pointer">
-                                    <Icons.User className="w-4 h-4" />
-                                </div>
-                                <Icons.Search className="w-5 h-5 cursor-pointer" />
-                            </div>
-                        </header>
-
-                        {/* Sub Header */}
-                        <div className="bg-white border-b border-gray-300 h-12 flex items-center justify-between px-4 shadow-sm">
-                            <div className="text-gray-500 cursor-pointer hover:text-gray-700" onClick={() => setActivePage('Dashboard')}>
-                                <Icons.Home className="w-4 h-4" />
-                            </div>
-                            
-                            <div className="flex items-center gap-1">
-                                <select className="border border-gray-300 text-xs py-1 px-2 rounded text-gray-600 outline-none">
-                                    <option>-- Select Widget --</option>
-                                </select>
-                                <button className="p-1 border border-gray-300 rounded hover:bg-gray-50">
-                                    <Icons.Plus className="w-4 h-4 text-gray-600" />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Page Content */}
-                        <div className="flex-1 overflow-y-auto p-4">
-                            {renderContent()}
-                        </div>
-
-                    </div>
+                <div class="col">
+                  <label>Until <span class="required">*</span></label>
+                  <input type="date" class="form-control" value="2025-11-30">
                 </div>
-            );
+              </div>
+              <button class="btn btn-success mt-3 float-right" onclick="loadAttendance()">Search</button>
+              <div class="clearfix"></div>
+            </div>
+          </div>
+
+          <div class="card-box">
+             <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Attendance for 11/2025</span>
+                <button class="btn btn-sm btn-success">Download PDF</button>
+             </div>
+             <div class="card-body p-0 table-responsive">
+               <table class="table table-xero mb-0">
+                 <thead>
+                   <tr>
+                     <th rowspan="2">Date</th>
+                     <th colspan="4">Work Time</th>
+                     <th colspan="4">Late / Early</th>
+                     <th colspan="4">Overtime</th>
+                   </tr>
+                   <tr>
+                     <th>In</th> <th>Out</th> <th>Break</th> <th>Total</th>
+                     <th>Early In</th> <th>Early Out</th> <th>Late In</th> <th>Late Out</th>
+                     <th>Start</th> <th>End</th> <th>Break</th> <th>Total</th>
+                   </tr>
+                 </thead>
+                 <tbody id="attendance-tbody">
+                   <tr><td colspan="13" class="text-center">Loading...</td></tr>
+                 </tbody>
+               </table>
+             </div>
+          </div>
+        </div>
+
+        <div id="page-leave" class="page-section d-none">
+           <h3 class="page-title">Leave Request</h3>
+           <div class="card-box">
+             <div class="card-header">Form Request</div>
+             <div class="card-body">
+                <form id="form-leave" onsubmit="submitForm(event, 'leave')">
+                  <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Leave Item <span class="required">*</span></label>
+                    <div class="col-sm-10">
+                      <select class="form-control" name="type">
+                        <option>-- Select --</option>
+                        <option value="1">Annual Leave</option>
+                        <option value="2">Sick Leave</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">From <span class="required">*</span></label>
+                    <div class="col-sm-4">
+                      <input type="date" class="form-control" name="start">
+                    </div>
+                    <label class="col-sm-2 col-form-label">Until <span class="required">*</span></label>
+                    <div class="col-sm-4">
+                      <input type="date" class="form-control" name="end">
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Reason</label>
+                    <div class="col-sm-10">
+                      <textarea class="form-control" rows="3" name="reason"></textarea>
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="text-right">
+                    <button type="button" class="btn btn-warning text-white">Save as Draft</button>
+                    <button type="submit" class="btn btn-success">Process</button>
+                  </div>
+                </form>
+             </div>
+           </div>
+        </div>
+
+        <div id="page-overtime" class="page-section d-none">
+          <h3 class="page-title">Overtime Request</h3>
+          <div class="card-box">
+            <div class="card-body">
+               <form id="form-overtime" onsubmit="submitForm(event, 'overtime')">
+                 <div class="form-group"><label>Date</label><input type="date" class="form-control"></div>
+                 <div class="form-group"><label>Activity</label><textarea class="form-control"></textarea></div>
+                 <div class="row">
+                   <div class="col"><label>Start</label><input type="time" class="form-control"></div>
+                   <div class="col"><label>End</label><input type="time" class="form-control"></div>
+                 </div>
+                 <button type="submit" class="btn btn-success mt-3 float-right">Submit</button>
+               </form>
+            </div>
+          </div>
+        </div>
+        
+        <div id="page-payslip" class="page-section d-none">
+           <h3 class="page-title">Payslip History</h3>
+           <div class="card-box">
+             <div class="card-body">
+               <div class="form-group row">
+                 <label class="col-sm-2">Year</label>
+                 <div class="col-sm-4">
+                   <select class="form-control"><option>2025</option></select>
+                 </div>
+                 <div class="col-sm-2"><button class="btn btn-success">Search</button></div>
+               </div>
+               <table class="table table-striped mt-3">
+                 <thead>
+                   <tr style="background:#f5f5f5"><th>Period</th><th>Payslip</th></tr>
+                 </thead>
+                 <tbody>
+                   <tr><td>October 2025</td><td><button class="btn btn-sm btn-success"><i class="fa fa-file-alt"></i> Monthly Payroll</button></td></tr>
+                   <tr><td>September 2025</td><td><button class="btn btn-sm btn-success"><i class="fa fa-file-alt"></i> Monthly Payroll</button></td></tr>
+                 </tbody>
+               </table>
+             </div>
+           </div>
+        </div>
+
+      </div> </div> <script>
+      // -- GLOBAL STATE --
+      let currentUser = null;
+
+      // 1. LOGIN LOGIC
+      function handleLogin(e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const btn = document.querySelector('.btn-login');
+        
+        btn.innerText = "Verifying...";
+        btn.disabled = true;
+
+        // Call Google Script Backend
+        google.script.run.withSuccessHandler(function(response) {
+          if (response.status === 'success') {
+            currentUser = response.data;
+            initializeDashboard();
+          } else {
+            document.getElementById('login-error').style.display = 'block';
+            document.getElementById('login-error').innerText = response.message;
+            btn.innerText = "SIGN IN";
+            btn.disabled = false;
+          }
+        }).loginUser(email, password);
+      }
+
+      // 2. DASHBOARD SETUP
+      function initializeDashboard() {
+        document.getElementById('login-page').style.display = 'none';
+        document.getElementById('app-layout').style.display = 'block';
+        
+        // Set User Info
+        document.getElementById('header-username').innerText = currentUser.name;
+        document.getElementById('sidebar-name').innerText = currentUser.name;
+        
+        const nameElements = document.getElementsByClassName('user-display-name');
+        for(let el of nameElements) el.innerText = currentUser.name.toUpperCase();
+
+        // Set Clock
+        setInterval(() => {
+          document.getElementById('server-time').innerText = new Date().toLocaleString();
+        }, 1000);
+      }
+
+      // 3. NAVIGATION LOGIC
+      function showPage(pageId) {
+        // Hide all sections
+        const sections = document.getElementsByClassName('page-section');
+        for (let sec of sections) sec.classList.add('d-none');
+        
+        // Show target
+        const target = document.getElementById('page-' + pageId);
+        if (target) target.classList.remove('d-none');
+
+        // Special Loader for Attendance
+        if (pageId === 'attendance') loadAttendance();
+      }
+
+      function toggleMenu(menuId) {
+        const menu = document.getElementById(menuId);
+        menu.style.display = (menu.style.display === 'none') ? 'block' : 'none';
+      }
+
+      function logout() {
+        location.reload();
+      }
+
+      // 4. DATA LOADING (MOCKUP FOR UI DEMO)
+      function loadAttendance() {
+        const tbody = document.getElementById('attendance-tbody');
+        tbody.innerHTML = '<tr><td colspan="13" class="text-center">Loading data from Sheets...</td></tr>';
+        
+        google.script.run.withSuccessHandler(function(data) {
+          tbody.innerHTML = '';
+          if(data.length === 0) {
+             tbody.innerHTML = '<tr><td colspan="13" class="text-center">No Data Found</td></tr>';
+             return;
+          }
+
+          data.forEach(row => {
+            const isWeekend = row.date.includes('Sat') || row.date.includes('Sun'); // Simple check logic need improvement
+            const tr = document.createElement('tr');
+            if(isWeekend) tr.classList.add('weekend-row');
+            
+            tr.innerHTML = `
+              <td>${row.date}</td>
+              <td>${row.in}</td><td>${row.out}</td><td>60</td><td>-</td>
+              <td>-</td><td>-</td><td>-</td><td>-</td>
+              <td>-</td><td>-</td><td>-</td><td>-</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }).getAttendanceLog(currentUser.id, 11, 2025);
+      }
+
+      // 5. FORM SUBMISSION
+      function submitForm(e, type) {
+        e.preventDefault();
+        if(!confirm("Are you sure want to submit this request?")) return;
+        
+        // Collect generic data
+        const data = {
+           empId: currentUser.id,
+           type: type,
+           // In real app, grab specific fields by ID
+           reason: "Demo Request" 
         };
 
-        // --- ROOT APP ---
-        const App = () => {
-            const [user, setUser] = useState(null);
-            const [loading, setLoading] = useState(false);
-            const [error, setError] = useState('');
+        google.script.run.withSuccessHandler(function(res){
+          alert(res.message);
+          document.getElementById('form-'+type).reset();
+        }).submitRequest(type, data);
+      }
 
-            useEffect(() => {
-                const savedUser = localStorage.getItem('hssi_user_real');
-                if (savedUser) {
-                    setUser(JSON.parse(savedUser));
-                }
-            }, []);
-
-            const handleLogin = async (username, password) => {
-                setLoading(true);
-                setError('');
-                try {
-                    const url = `${API_URL}?action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error('Gagal menghubungi server.');
-                    const data = await response.json();
-                    if (data.status === 'success') {
-                        const userData = { username: data.data.username, role: data.data.role };
-                        setUser(userData);
-                        localStorage.setItem('hssi_user_real', JSON.stringify(userData));
-                    } else {
-                        setError(data.message || 'Username atau password salah.');
-                    }
-                } catch (err) {
-                    console.error(err);
-                    setError('Terjadi kesalahan. Coba lagi.');
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            const handleLogout = () => {
-                setUser(null);
-                localStorage.removeItem('hssi_user_real');
-            };
-
-            if (!user) return <LoginPage onLogin={handleLogin} loading={loading} error={error} />;
-            return <Dashboard user={user} onLogout={handleLogout} />;
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
     </script>
-</body>
+  </body>
 </html>
